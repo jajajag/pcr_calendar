@@ -12,7 +12,7 @@ def transform_bilibili_calendar(data):
         end = event.find('span', {'class': 'eventTimer'})['data-end']
         # Extract the inner div and find title
         event.div.extract()
-        title = soup.text
+        title = event.text
         # Add the event to the list
         event_list.append({'title': title, 'start': start, 'end': end})
 
