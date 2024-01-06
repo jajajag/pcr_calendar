@@ -11,21 +11,18 @@ from .gamewith_calendar import transform_gamewith_calendar
 
 event_data = {
     'cn': [],
-    'cnb': [],
     'tw': [],
     'jp': [],
 }
 
 event_updated = {
     'cn': '',
-    'cnb': '',
     'tw': '',
     'jp': '',
 }
 
 lock = {
     'cn': asyncio.Lock(),
-    'cnb': asyncio.Lock(),
     'tw': asyncio.Lock(),
     'jp': asyncio.Lock(),
 }
@@ -39,44 +36,29 @@ async def query_data(url):
         pass
     return None
 
-async def load_event_bilibili():
+async def load_event_cn():
     data = ''
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get('https://static.biligame.com/pcr/gw/calendar.js') as resp:
+            async with session.get(
+                    'https://wiki.biligame.com/pcr/活动日历') as resp:
                 data = await resp.text('utf-8')
-                data = transform_bilibili_calendar(data)
+                data = transform_cn_calendar(data)
     except:
-        print('解析B站日程表失败')
+        print('解析B站WIKI日程表失败')
         return 1
-    if data:
-        if len(data) == 0:
-            print('B站日程表无数据')
-            return 1
-        event_data['cnb'] = []
-        for item in data:
-            start_time = datetime.datetime.strptime(item['start'], r"%Y/%m/%d %H:%M")
-            end_time = datetime.datetime.strptime(item['end'], r"%Y/%m/%d %H:%M")
-            event = {'title': item['title'], 'start': start_time, 'end': end_time, 'type': 1}
-            if '倍' in event['title']:
-                event['type'] = 2
-            elif '团队战' in event['title']:
-                event['type'] = 3
-            event_data['cnb'].append(event)
-        return 0
-    return 1
-
-async def load_event_cn():
-    data = await query_data('https://pcrbot.github.io/calendar-updater-action/cn.json')
     if data:
         event_data['cn'] = []
         for item in data:
-            start_time = datetime.datetime.strptime(item['start_time'], r"%Y/%m/%d %H:%M:%S")
-            end_time = datetime.datetime.strptime(item['end_time'], r"%Y/%m/%d %H:%M:%S")
-            event = {'title': item['name'], 'start': start_time, 'end': end_time, 'type': 1}
+            start_time = datetime.datetime.strptime(
+                    item['start'], r"%Y/%m/%d %H:%M")
+            end_time = datetime.datetime.strptime(
+                    item['end'], r"%Y/%m/%d %H:%M")
+            event = {'title': item['title'], 'start': start_time, 
+                     'end': end_time, 'type': 1}
             if '倍' in event['title']:
                 event['type'] = 2
-            elif '公会战' in event['title']:
+            elif '团队战' in event['title']:
                 event['type'] = 3
             event_data['cn'].append(event)
         return 0
@@ -127,17 +109,18 @@ async def load_event_gamewith():
     if data:
         event_data['jp'] = []
         for item in data:
-            start_time = datetime.datetime.strptime(item['start_time'], r'%Y/%m/%d %H:%M:%S')
-            end_time = datetime.datetime.strptime(item['end_time'], r'%Y/%m/%d %H:%M:%S')
-            event = {'title': item['name'], 'start': start_time, 'end': end_time, 'type': item['type']}
+            start_time = datetime.datetime.strptime(
+                    item['start_time'], r'%Y/%m/%d %H:%M:%S')
+            end_time = datetime.datetime.strptime(
+                    item['end_time'], r'%Y/%m/%d %H:%M:%S')
+            event = {'title': item['name'], 'start': start_time, 
+                     'end': end_time, 'type': item['type']}
             event_data['jp'].append(event)
         return 0
     return 1
 
 async def load_event(server):
-    if server == 'cnb':
-        return await load_event_bilibili()
-    elif server == 'cn':
+    if server == 'cn':
         return await load_event_cn()
     elif server == 'tw':
         return await load_event_tw()
@@ -149,7 +132,8 @@ def get_pcr_now(offset):
     pcr_now = datetime.datetime.now()
     if pcr_now.hour < 5:
         pcr_now -= datetime.timedelta(days=1)
-    pcr_now = pcr_now.replace(hour=18, minute=0, second=0, microsecond=0) #用晚6点做基准
+    #用晚6点做基准
+    pcr_now = pcr_now.replace(hour=18, minute=0, second=0, microsecond=0) 
     pcr_now = pcr_now + datetime.timedelta(days=offset)
     return pcr_now
 
@@ -158,7 +142,8 @@ async def get_events(server, offset, days):
     pcr_now = datetime.datetime.now()
     if pcr_now.hour < 5:
         pcr_now -= datetime.timedelta(days=1)
-    pcr_now = pcr_now.replace(hour=18, minute=0, second=0, microsecond=0) #用晚6点做基准
+    #用晚6点做基准
+    pcr_now = pcr_now.replace(hour=18, minute=0, second=0, microsecond=0)
 
     await lock[server].acquire()
     try:
@@ -175,11 +160,18 @@ async def get_events(server, offset, days):
     end -= datetime.timedelta(hours=18)  #晚上12点结束
 
     for event in event_data[server]:
-        if end > event['start'] and start < event['end']: #在指定时间段内 已开始 且 未结束
-            event['start_days'] = math.ceil((event['start'] - start) / datetime.timedelta(days=1)) #还有几天开始
-            event['left_days'] = math.floor((event['end'] - start) / datetime.timedelta(days=1)) #还有几天结束
+        #在指定时间段内 已开始 且 未结束
+        if end > event['start'] and start < event['end']:
+            #还有几天开始
+            event['start_days'] = math.ceil(
+                    (event['start'] - start) / datetime.timedelta(days=1))
+            #还有几天结束
+            event['left_days'] = math.floor(
+                    (event['end'] - start) / datetime.timedelta(days=1))
             events.append(event)
-    events.sort(key=lambda item: item["type"] * 100 - item['left_days'], reverse = True) #按type从大到小 按剩余天数从小到大
+    #按type从大到小 按剩余天数从小到大
+    events.sort(key=lambda item: item["type"] * 100 - item['left_days'], 
+                reverse = True)
     return events
 
 
