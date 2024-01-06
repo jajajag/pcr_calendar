@@ -43,7 +43,7 @@ async def load_event_cn():
             async with session.get(
                     'https://wiki.biligame.com/pcr/活动日历') as resp:
                 data = await resp.text('utf-8')
-                data = transform_cn_calendar(data)
+                data = transform_bilibili_calendar(data)
     except:
         print('解析B站WIKI日程表失败')
         return 1

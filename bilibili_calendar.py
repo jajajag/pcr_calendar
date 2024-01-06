@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 
-def transform_cn_calendar(data):
+def transform_bilibili_calendar(data):
     soup = BeautifulSoup(data, 'html.parser')
     event_cache = soup.find_all('div', {'class': 'calendar-line'})
     event_list = []
