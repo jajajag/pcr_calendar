@@ -10,11 +10,11 @@ def transform_bilibili_calendar(data):
         #data-info = event.find('span', {'class': 'eventTimer'})['data-info']
         start = event.find('span', {'class': 'eventTimer'})['data-start']
         end = event.find('span', {'class': 'eventTimer'})['data-end']
-        # Extract the inner div and find title
-        event.div.extract()
         # If the event is a 卡池
         if event.span.span:
             event.span.span.extract()
+        # Extract the inner div and find title
+        event.div.extract()
         title = event.text
         if '国服运营中' in title: continue
         # Add the event to the list
