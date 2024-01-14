@@ -11,8 +11,9 @@ def transform_bilibili_calendar(data):
         start = event.find('span', {'class': 'eventTimer'})['data-start']
         end = event.find('span', {'class': 'eventTimer'})['data-end']
         # If the event is a 卡池
-        if event.span.span:
-            event.span.span.extract()
+        for span in event.find_all('span'):
+            if span.span:
+                span.span.extract()
         # Extract the inner div and find title
         event.div.extract()
         title = event.text
