@@ -6,7 +6,7 @@ def transform_bilibili_calendar(data):
     event_list = []
 
     for event in event_cache:
-        # data-info: 活动(剧情), 庆典(加倍), 卡池
+        # data-info: 活动(剧情), 庆典(加倍), 卡池, 团队战
         #data-info = event.find('span', {'class': 'eventTimer'})['data-info']
         start = event.find('span', {'class': 'eventTimer'})['data-start']
         end = event.find('span', {'class': 'eventTimer'})['data-end']
