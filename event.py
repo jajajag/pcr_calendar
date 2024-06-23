@@ -36,7 +36,7 @@ async def query_data(url):
         pass
     return None
 
-async def load_event_base(data, server, time):
+def load_event_base(data, server, time):
     if not data: return 1
     event_data[server] = []
     for item in data:
@@ -72,11 +72,11 @@ async def load_event_cn():
     except:
         print('解析B站WIKI日程表失败')
         return 1
-    return await load_event_base(data, 'cn', r"%Y/%m/%d %H:%M"):
+    return load_event_base(data, 'cn', r"%Y/%m/%d %H:%M"):
 
 async def load_event_tw():
     data = await query_data('https://pcredivewiki.tw/static/data/event.json')
-    return await load_event_base(data, 'tw', r"%Y/%m/%d %H:%M"):
+    return load_event_base(data, 'tw', r"%Y/%m/%d %H:%M"):
 
 async def load_event_jp():
     data = ''
@@ -88,7 +88,7 @@ async def load_event_jp():
     except:
         print('解析gamewith日程表失败')
         return 1
-    return await load_event_base(data, 'jp', r"%Y/%m/%d %H:%M:%S"):
+    return load_event_base(data, 'jp', r"%Y/%m/%d %H:%M:%S"):
 
 async def load_event(server):
     if server == 'cn':
