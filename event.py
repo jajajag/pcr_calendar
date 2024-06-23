@@ -46,7 +46,7 @@ def load_event_base(data, server, time):
             end_time = datetime.datetime.strptime(
                     item['end_time'], time)
             event = {'title': item['campaign_name'], 'start': start_time, 
-                     'end': end_time, 'type': item['type']}
+                     'end': end_time, 'type': int(item['type'])}
             # The event type for TW server is different from CN and JP
             if server == 'tw':
                 if item['type'] == 7:
