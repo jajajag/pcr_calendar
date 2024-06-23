@@ -36,6 +36,31 @@ async def query_data(url):
         pass
     return None
 
+async def load_event_base(data, server, time, time, drop, clan):
+    if not data: return 1
+    event_data[server] = []
+    for item in data:
+        try:
+            start_time_base = datetime.datetime.strptime(
+                    item['start_time'], time)
+            end_time_base = datetime.datetime.strptime(
+                    item['end_time'], time)
+            event = {'title': item['title'], 'start': start_time, 
+                     'end': end_time, 'type': item['type']}
+            # The event type for TW server is different from CN and JP
+            if server == 'tw':
+                if item['type'] == 7:
+                    event['type'] = 2
+                elif item['type'] == 3:
+                    event['type'] = 3
+                else:
+                    event['type'] = 1
+            event_data[server].append(event)
+        except:
+            # JAG: Drop exception events
+            pass
+    return 0
+
 async def load_event_cn():
     data = ''
     try:
@@ -47,56 +72,13 @@ async def load_event_cn():
     except:
         print('解析B站WIKI日程表失败')
         return 1
-    if data:
-        event_data['cn'] = []
-        for item in data:
-            start_time = datetime.datetime.strptime(
-                    item['start'], r"%Y/%m/%d %H:%M")
-            end_time = datetime.datetime.strptime(
-                    item['end'], r"%Y/%m/%d %H:%M")
-            event = {'title': item['title'], 'start': start_time, 
-                     'end': end_time, 'type': 1}
-            if '倍' in event['title']:
-                event['type'] = 2
-            elif '团队战' in event['title']:
-                event['type'] = 3
-            event_data['cn'].append(event)
-        return 0
-    return 1
+    return load_event_base(data, 'cn', r"%Y/%m/%d %H:%M"):
 
 async def load_event_tw():
     data = await query_data('https://pcredivewiki.tw/static/data/event.json')
-    if data:
-        event_data['tw'] = []
-        for item in data:
-            start_time = datetime.datetime.strptime(item['start_time'], r"%Y/%m/%d %H:%M")
-            end_time = datetime.datetime.strptime(item['end_time'], r"%Y/%m/%d %H:%M")
-            event = {'title': item['campaign_name'], 'start': start_time, 'end': end_time, 'type': 1}
-            if '倍' in event['title']:
-                event['type'] = 2
-            elif '戰隊' in event['title']:
-                event['type'] = 3
-            event_data['tw'].append(event)
-        return 0
-    return 1
+    return load_event_base(data, 'tw', r"%Y/%m/%d %H:%M"):
 
 async def load_event_jp():
-    data = await query_data('https://cdn.jsdelivr.net/gh/pcrbot/calendar-updater-action@gh-pages/jp.json')
-    if data:
-        event_data['jp'] = []
-        for item in data:
-            start_time = datetime.datetime.strptime(item['start_time'], r'%Y/%m/%d %H:%M:%S')
-            end_time = datetime.datetime.strptime(item['end_time'], r'%Y/%m/%d %H:%M:%S')
-            event = {'title': item['name'], 'start': start_time, 'end': end_time, 'type': 1}
-            if '倍' in event['title']:
-                event['type'] = 2
-            elif '公会战' in event['title']:
-                event['type'] = 3
-            event_data['jp'].append(event)
-        return 0
-    return 1
-
-async def load_event_gamewith():
     data = ''
     try:
         async with aiohttp.ClientSession() as session:
@@ -106,18 +88,7 @@ async def load_event_gamewith():
     except:
         print('解析gamewith日程表失败')
         return 1
-    if data:
-        event_data['jp'] = []
-        for item in data:
-            start_time = datetime.datetime.strptime(
-                    item['start_time'], r'%Y/%m/%d %H:%M:%S')
-            end_time = datetime.datetime.strptime(
-                    item['end_time'], r'%Y/%m/%d %H:%M:%S')
-            event = {'title': item['name'], 'start': start_time, 
-                     'end': end_time, 'type': item['type']}
-            event_data['jp'].append(event)
-        return 0
-    return 1
+    return load_event_base(data, 'jp', r"%Y/%m/%d %H:%M:%S"):
 
 async def load_event(server):
     if server == 'cn':
@@ -125,7 +96,7 @@ async def load_event(server):
     elif server == 'tw':
         return await load_event_tw()
     elif server == 'jp':
-        return await load_event_gamewith()
+        return await load_event_jp()
     return 1
 
 def get_pcr_now(offset):
