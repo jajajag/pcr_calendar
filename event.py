@@ -51,7 +51,7 @@ def load_event_base(data, server, time):
             if server == 'tw':
                 if item['type'] == '7':
                     event['type'] = 2
-                elif item['type'] == '3':
+                elif '戰隊' in item['campaign_name']:
                     event['type'] = 3
                 else:
                     event['type'] = 1
