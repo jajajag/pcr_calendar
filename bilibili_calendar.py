@@ -7,8 +7,8 @@ def transform_bilibili_calendar(data):
 
     for event in event_cache:
         # data-info: 活动(剧情), 庆典(加倍), 卡池, 团队战
-        start = event.find('span', {'class': 'eventTimer'})['data-start']
-        end = event.find('span', {'class': 'eventTimer'})['data-end']
+        start_time = event.find('span', {'class': 'eventTimer'})['data-start']
+        end_time = event.find('span', {'class': 'eventTimer'})['data-end']
         # JAG: type id of the events
         data_info = event.find('span', {'class': 'eventTimer'})['data-info']
         if data_info == '庆典':
@@ -23,10 +23,11 @@ def transform_bilibili_calendar(data):
                 span.span.extract()
         # Extract the inner div and find title
         event.div.extract()
-        title = event.text
+        campaign_name = event.text
         if '国服运营中' in title: continue
         # Add the event to the list
-        event_list.append({'title': title, 'start': start, 'end': end,
-                           'type': type_id})
+        event_list.append({
+            'campaign_name': campaign_name, 'start_time': start_time,
+            'end_time': end, 'type': type_id})
 
     return event_list

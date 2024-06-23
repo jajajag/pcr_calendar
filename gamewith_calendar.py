@@ -29,11 +29,11 @@ def transform_gamewith_calendar(html_text):
             type_id = 3
         else:
             type_id = 1
-        name = event['event_name']
+        campaign_name = event['event_name']
         for k, v in translate_list.items():
-            name = name.replace(k, v)
+            campaign_name = campaign_name.replace(k, v)
         event_list[event['id']] = {
-            'name': name,
+            'campaign_name': campaign_name,
             'start_time': time.strftime("%Y/%m/%d %H:%M:%S", start),
             'end_time': time.strftime("%Y/%m/%d %H:%M:%S", end),
             'type': type_id,
