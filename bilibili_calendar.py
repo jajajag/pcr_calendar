@@ -24,7 +24,7 @@ def transform_bilibili_calendar(data):
         # Extract the inner div and find title
         event.div.extract()
         campaign_name = event.text
-        if '国服运营中' in title: continue
+        if '国服运营中' in campaign_name: continue
         # Add the event to the list
         event_list.append({
             'campaign_name': campaign_name, 'start_time': start_time,
