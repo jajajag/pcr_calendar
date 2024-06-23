@@ -36,7 +36,7 @@ async def query_data(url):
         pass
     return None
 
-async def load_event_base(data, server, time, time, drop, clan):
+async def load_event_base(data, server, time):
     if not data: return 1
     event_data[server] = []
     for item in data:
