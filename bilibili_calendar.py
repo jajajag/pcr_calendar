@@ -28,6 +28,6 @@ def transform_bilibili_calendar(data):
         # Add the event to the list
         event_list.append({
             'campaign_name': campaign_name, 'start_time': start_time,
-            'end_time': end, 'type': type_id})
+            'end_time': end_time, 'type': type_id})
 
     return event_list
