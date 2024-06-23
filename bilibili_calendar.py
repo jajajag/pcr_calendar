@@ -10,10 +10,10 @@ def transform_bilibili_calendar(data):
         start = event.find('span', {'class': 'eventTimer'})['data-start']
         end = event.find('span', {'class': 'eventTimer'})['data-end']
         # JAG: type id of the events
-        data-info = event.find('span', {'class': 'eventTimer'})['data-info']
-        if data-info == '庆典':
+        data_info = event.find('span', {'class': 'eventTimer'})['data-info']
+        if data_info == '庆典':
             type_id = 2
-        elif data-info == '团队战':
+        elif data_info == '团队战':
             type_id = 3
         else:
             type_id = 1
